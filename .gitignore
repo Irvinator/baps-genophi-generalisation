@@ -1,0 +1,25 @@
+# Large bio data / archives
+*.fna
+*.faa
+*.fasta
+*.fa
+*.gz
+*.zip
+*.msh
+
+# NCBI datasets output folders
+ncbi_dataset/
+batch_*/
+genophi_batch_*/
+
+# Project outputs (keep scripts, not generated data)
+outputs/
+runs/
+mash/
+
+# Python
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
