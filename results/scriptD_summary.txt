@@ -1,0 +1,8 @@
+scriptD_filter_pairs_by_fasta_presence.py
+Input:  outputs/baps_ecoli_pos_pairs.tsv (1,168,085 positive host–phage contig pairs)
+Contig list: outputs/baps_all_phage_contigs_from_fasta.txt (119,510 contigs)
+
+Result:
+Pairs kept: 25,273
+Pairs removed: 1,142,812
+Output: outputs/baps_ecoli_pos_pairs_in_fasta.tsv (25,274 lines incl header)

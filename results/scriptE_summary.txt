@@ -1,0 +1,9 @@
+scriptE_compute_min_mash_distance.py
+Input mash TSV: outputs/ecoli_hosts_200/mash_dist_genophiTrain_vs_baps200.abs.tsv (31,400 rows)
+Allowed BAPS list: outputs/sampled_hosts_200_seed42.txt (200 accessions)
+
+Result:
+Unique BAPS accessions: 200
+Distance summary:
+min=0.000533  p25=0.004549  p50=0.008538  p75=0.010655  max=0.019118  mean=0.007973
+Output CSV: outputs/baps200_min_dist_to_genophi_train.csv
