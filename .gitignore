@@ -17,6 +17,11 @@ outputs/
 runs/
 mash/
 
+# more local folders
+ecoli_hosts_200/
+results/*.csv
+results/*.tsv
+
 # Python
 __pycache__/
 *.pyc
