@@ -133,6 +133,18 @@ conda create -n baps python=3.10 pandas mash
 
 ------------------------------------------------------------------------
 
+## MASH distance computation
+
+After downloading host genomes and GenoPHI genomes:
+
+```bash
+mash sketch -o mash/genophi_ecoli_downloaded genophi_ecoli_157_genomes.txt
+mash sketch -o mash/baps_ecoli_200 baps_ecoli_200_genomes.txt
+
+mash dist mash/genophi_ecoli_downloaded.msh \
+          mash/baps_ecoli_200.msh \
+  > mash_dist_genophiTrain_vs_baps200.tsv
+
 ## Future Work
 
 -   Expand training set using larger BAPS interaction matrices
