@@ -144,7 +144,7 @@ mash sketch -o mash/baps_ecoli_200 baps_ecoli_200_genomes.txt
 mash dist mash/genophi_ecoli_downloaded.msh \
           mash/baps_ecoli_200.msh \
   > mash_dist_genophiTrain_vs_baps200.tsv
-
+```
 ## Future Work
 
 -   Expand training set using larger BAPS interaction matrices
