@@ -1,86 +1,90 @@
+import argparse
 import pandas as pd
 import numpy as np
 from pathlib import Path
+import random
 
-IN_POS = Path.home() / "data/BAPS/outputs/baps_ecoli_pos_pairs.tsv"
-OUT_DIR = Path.home() / "data/BAPS/outputs"
-OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-# ---- Controls (edit these) ----
-N_HOSTS = 200                  # number of bacterial hosts (accessions)
-MAX_POS_PER_HOST = 10          # positives sampled per host (cap)
-NEG_PER_POS = 1                # how many negatives per positive (1 => balanced)
-SEED = 42
-# --------------------------------
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--pos_pairs_tsv", required=True)
+    parser.add_argument("--out_csv", required=True)
+    parser.add_argument("--n_hosts", type=int, default=200)
+    parser.add_argument("--max_pos_per_host", type=int, default=10)
+    parser.add_argument("--neg_ratio", type=int, default=1)
+    parser.add_argument("--seed", type=int, default=42)
+    args = parser.parse_args()
 
-rng = np.random.default_rng(SEED)
+    random.seed(args.seed)
+    np.random.seed(args.seed)
 
-# Load positives
-pos = pd.read_csv(IN_POS, sep="\t")
-pos = pos.dropna().drop_duplicates()
+    # Load positives
+    df = pd.read_csv(args.pos_pairs_tsv, sep="\t")
+    print(f"[scriptB] Loaded positives: {len(df):,}")
 
-# Unique hosts and phages
-hosts = pos["host_accession"].unique()
-phages = pos["phage_contig"].unique()
+    print(f"[scriptB] Unique hosts: {df['host_accession'].nunique():,}")
+    print(f"[scriptB] Unique phage contigs: {df['phage_contig'].nunique():,}")
 
-print(f"Loaded positives: {len(pos):,}")
-print(f"Unique hosts: {len(hosts):,}")
-print(f"Unique phage contigs: {len(phages):,}")
+    # Sample hosts
+    hosts = df["host_accession"].unique()
+    sampled_hosts = np.random.choice(
+        hosts,
+        size=min(args.n_hosts, len(hosts)),
+        replace=False
+    )
 
-# Sample hosts
-if N_HOSTS > len(hosts):
-    N_HOSTS = len(hosts)
-sampled_hosts = rng.choice(hosts, size=N_HOSTS, replace=False)
+    df_hosts = df[df["host_accession"].isin(sampled_hosts)].copy()
 
-# Build positives subset
-pos_sub = (
-    pos_filtered.groupby("host_accession", group_keys=False)
-    .apply(lambda df: df.sample(n=min(len(df), MAX_POS_PER_HOST), random_state=SEED))
-    .reset_index(drop=True)
-))
+    # Cap positives per host
+    df_pos = (
+        df_hosts.groupby("host_accession", group_keys=False)
+        .apply(lambda x: x.sample(
+            n=min(len(x), args.max_pos_per_host),
+            random_state=args.seed
+        ))
+        .reset_index(drop=True)
+    )
 
-pos_sub = pos_sub.rename(columns={"host_accession": "strain", "phage_contig": "phage"})
-pos_sub["interaction"] = 1
+    df_pos["interaction"] = 1
 
-# Build negatives
-neg_rows = []
-pos_by_host = (
-    pos[pos["host_accession"].isin(sampled_hosts)]
-    .groupby("host_accession")["phage_contig"]
-    .apply(set)
-    .to_dict()
-)
+    print(f"[scriptB] Positives kept after cap: {len(df_pos):,}")
 
-for host in sampled_hosts:
-    host_pos = pos_by_host.get(host, set())
-    if not host_pos:
-        continue
+    # Build negatives
+    all_contigs = df["phage_contig"].unique()
+    neg_rows = []
 
-    # candidates are all phages not in host positives
-    candidates = np.array(list(set(phages) - host_pos))
-    if len(candidates) == 0:
-        continue
+    for host in sampled_hosts:
+        host_pos = df_pos[df_pos["host_accession"] == host]["phage_contig"].values
+        candidate_neg = list(set(all_contigs) - set(host_pos))
 
-    # number of negatives to sample
-    n_pos = min(len(host_pos), MAX_POS_PER_HOST)
-    n_neg = n_pos * NEG_PER_POS
+        n_neg = args.neg_ratio * len(host_pos)
 
-    chosen = rng.choice(candidates, size=min(n_neg, len(candidates)), replace=False)
-    for ph in chosen:
-        neg_rows.append((host, ph, 0))
+        if len(candidate_neg) == 0 or n_neg == 0:
+            continue
 
-neg = pd.DataFrame(neg_rows, columns=["strain", "phage", "interaction"])
+        chosen_neg = np.random.choice(
+            candidate_neg,
+            size=min(n_neg, len(candidate_neg)),
+            replace=False
+        )
 
-# Combine
-df = pd.concat([pos_sub[["strain","phage","interaction"]], neg], ignore_index=True)
+        for contig in chosen_neg:
+            neg_rows.append((host, contig, 0))
 
-# Shuffle rows
-df = df.sample(frac=1, random_state=SEED).reset_index(drop=True)
+    neg_df = pd.DataFrame(
+        neg_rows,
+        columns=["host_accession", "phage_contig", "interaction"]
+    )
 
-out_path = OUT_DIR / f"baps_ecoli_posneg_hosts{N_HOSTS}_pos{MAX_POS_PER_HOST}_neg{NEG_PER_POS}_seed{SEED}.csv"
-df.to_csv(out_path, index=False)
+    print(f"[scriptB] Negatives created: {len(neg_df):,}")
 
-print("\nOutput:", out_path)
-print(df["interaction"].value_counts())
-print("\nExample:")
-print(df.head(10).to_string(index=False))
+    final_df = pd.concat([df_pos, neg_df], ignore_index=True)
+
+    final_df.to_csv(args.out_csv, index=False)
+
+    print(f"[scriptB] Wrote dataset: {args.out_csv}")
+    print(final_df["interaction"].value_counts())
+
+
+if __name__ == "__main__":
+    main()
