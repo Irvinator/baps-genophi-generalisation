@@ -1,30 +1,52 @@
 # Large bio data / archives
 *.fna
-*.faa
-*.fasta
-*.fa
-*.gz
-*.zip
-*.msh
-
-# NCBI datasets output folders
-ncbi_dataset/
-batch_*/
-genophi_batch_*/
-
-# Project outputs (keep scripts, not generated data)
-outputs/
-runs/
-mash/
-
-# more local folders
-ecoli_hosts_200/
-results/*.csv
-results/*.tsv
-
 # Python
 __pycache__/
 *.pyc
+*.pyo
 
-# OS
+# OS/editor
 .DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Environments
+.env
+.venv/
+venv/
+
+# Large bioinformatics / temp outputs
+tmp/
+temp/
+*.zip
+*.msh
+*.db
+*.index
+*.lookup
+
+# Large sequence/data files
+*.faa
+*.fna
+*.fastq
+*.fq
+*.bam
+*.sam
+
+# MMseqs / Mash / CatBoost temp outputs
+catboost_info/
+results/**/tmp/
+tmp_phage_fna/
+
+# Large generated files you likely don't want in git
+merged_feature_table.csv
+strain_all_predictions.csv
+
+# LaTeX build files
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.fls
+*.fdb_latexmk
