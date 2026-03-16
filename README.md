@@ -1,152 +1,215 @@
-# BAPS × GenoPHI Generalisation Experiments
+# GenoPHI Generalisation Analysis on BAPS Dataset
+
+This repository contains the code and analysis used to evaluate the generalisation performance of the GenoPHI phage–host interaction prediction framework on an external dataset derived from BAPS (Bacterial Assembly-Associated Phage Sequences).
 
 ## Project Overview
 
-This project investigates the generalisation performance of GenoPHI on
-novel Escherichia coli host–phage interactions derived from the BAPS
-lytic phage dataset.
+Predicting phage–host interactions is important for applications such as phage therapy and microbiome engineering. GenoPHI is a machine learning framework that predicts strain-level phage–host interactions using genome-derived features.
 
-Objectives:
+This project evaluates whether GenoPHI generalises to an independent dataset of phage–host interactions derived from BAPS.
 
-1.  Extract host–phage interactions from the BAPS dataset.
-2.  Construct a balanced positive/negative dataset.
-3.  Map GenoPHI training strain names to NCBI genome assemblies.
-4.  Download host genomes from NCBI.
-5.  Quantify genomic distance between GenoPHI training strains and novel
-    BAPS strains.
-6.  Evaluate generalisation using MASH distances.
+The key goals were:
 
-------------------------------------------------------------------------
+- Apply trained GenoPHI models to an external dataset
+- Evaluate predictive performance on unseen phage genomes
+- Investigate causes of reduced performance
+- Analyse protein family overlap between training and evaluation datasets
 
-## Data Sources
+## Dataset
 
-BAPS Dataset: - current_BAPS_anns.tsv
+The evaluation dataset is derived from the **BAPS phage–host interaction dataset**.
 
-GenoPHI Training Data: -
-data/interation_matrices/ecoli_interaction_matrix_subset.csv
+A **randomly sampled subset** of the BAPS dataset was used to create an independent evaluation test set.
 
-NCBI Genomes: Downloaded using: datasets download genome accession
+Dataset characteristics:
 
-------------------------------------------------------------------------
+- 200 bacterial strains
+- 144 phages
+- 28,800 strain–phage prediction combinations
+- 428 labelled interaction pairs
 
-## Pipeline Overview
+## Methods
 
-### 1. Extract BAPS Positive Host–Phage Pairs
+The evaluation pipeline followed these steps:
 
-Script: scripts/scriptA_build_baps_ecoli_pos_pairs.py
+1. Assign proteins from BAPS strains and phages to GenoPHI protein families using **MMseqs2**
+2. Convert assignments to **binary presence/absence feature tables**
+3. Generate predictions using trained **CatBoost models**
+4. Aggregate prediction confidence scores across training runs
+5. Evaluate predictions using standard metrics:
 
-Input: current_BAPS_anns.tsv
+- ROC-AUC
+- PR-AUC
+- Accuracy
+- Precision
+- Recall
+- MCC
 
-Output: - outputs/baps_ecoli_pos_pairs.tsv -
-outputs/baps_ecoli_accessions.txt
+## Results Summary
 
-Purpose: Filter BAPS annotations for E. coli hosts and extract host
-assembly accession (GCA\_\*) and associated phage contig. All extracted
-pairs are labelled as positive (interaction = 1).
+Model performance on the BAPS dataset:
 
-------------------------------------------------------------------------
+| Metric | Value |
+|------|------|
+| ROC-AUC | 0.44 |
+| Accuracy | 0.16 |
+| Precision | 0 |
+| Recall | 0 |
 
-### 2. Construct Balanced Positive/Negative Dataset
+The model predicted **all interactions as negative** at the default threshold.
 
-Script: scripts/scriptB_build_posneg_dataset.py
-
-Input: outputs/baps_ecoli_pos_pairs.tsv
-
-Output (example):
-outputs/baps_ecoli_posneg_hosts200_pos10_neg1_seed42.csv
-
-Method: - Randomly sample 200 E. coli host genomes - For each host: -
-Sample up to 10 positive interactions - Generate 1 negative per positive
-by pairing with a phage not annotated for that host - Fixed random seed
-ensures reproducibility
-
-Resulting dataset is balanced (e.g., 914 positives / 914 negatives).
-
-------------------------------------------------------------------------
-
-### 3. Map GenoPHI Strains to NCBI Assemblies
-
-Script: scripts/scriptC_map_genophi_strains_to_ncbi_accessions.py
-
-Input: data/interation_matrices/ecoli_interaction_matrix_subset.csv
-
-Output: - outputs/genophi_ecoli_strain_to_accession.tsv -
-outputs/genophi_ecoli_accessions.txt
-
-Purpose: Map named GenoPHI training strains (e.g., ECOR48, BL21) to NCBI
-assembly accessions (GCA/GCF). This enables downloading the correct
-genome assemblies for distance analysis.
-
-------------------------------------------------------------------------
-
-## Genome Download (NCBI)
-
-Genomes were downloaded in batches to avoid archive errors.
-
-Example: datasets download genome accession –inputfile
-genophi_batch_00.txt
-
-Extract FASTA files: find genophi_batch\_\* -name “\*genomic.fna” \>
-genophi_ecoli_157_genomes.txt
-
-------------------------------------------------------------------------
-
-## Genomic Distance Analysis (MASH)
-
-Sketch genomes: mash sketch -o mash/genophi_ecoli_downloaded
-genophi_ecoli_157_genomes.txt mash sketch -o mash/baps_ecoli_200
-baps_ecoli_200_genomes.txt
-
-Compute pairwise distances: mash dist mash/genophi_ecoli_downloaded.msh
-mash/baps_ecoli_200.msh \> outputs/mash_dist_genophiTrain_vs_baps200.tsv
-
-Extract minimum distance per BAPS host:
-outputs/baps200_min_dist_to_genophi_train.csv
-
-Example summary: - Mean Mash distance ≈ 0.008 - Approximate ANI ≈
-0.992 - Some genomes nearly identical to GenoPHI training strains
-
-------------------------------------------------------------------------
-
-## Key Finding
-
-The sampled BAPS E. coli genomes are highly genetically similar to the
-GenoPHI training strains. This indicates that current evaluation
-primarily tests near-distribution performance rather than far
-generalisation.
-
-------------------------------------------------------------------------
+Protein family overlap analysis shows that many BAPS phages contain proteins not present in the GenoPHI training dataset, limiting feature representation and reducing prediction accuracy.
 
 ## Repository Structure
+# GenoPHI Generalisation Analysis on BAPS Dataset
 
-baps-genophi-generalisation/ ├── scripts/ ├── README.md └── .gitignore
+This repository contains the code and analysis used to evaluate the generalisation performance of the GenoPHI phage–host interaction prediction framework on an external dataset derived from BAPS (Bacterial Assembly-Associated Phage Sequences).
 
-Large genome downloads and FASTA files are excluded via .gitignore.
+## Project Overview
 
-------------------------------------------------------------------------
+Predicting phage–host interactions is important for applications such as phage therapy and microbiome engineering. GenoPHI is a machine learning framework that predicts strain-level phage–host interactions using genome-derived features.
 
-## Reproducibility
+This project evaluates whether GenoPHI generalises to an independent dataset of phage–host interactions derived from BAPS.
 
-Recommended environment:
+The key goals were:
 
-conda create -n baps python=3.10 pandas mash
+- Apply trained GenoPHI models to an external dataset
+- Evaluate predictive performance on unseen phage genomes
+- Investigate causes of reduced performance
+- Analyse protein family overlap between training and evaluation datasets
 
-------------------------------------------------------------------------
+## Dataset
 
-## MASH distance computation
+The evaluation dataset is derived from the **BAPS phage–host interaction dataset**.
 
-After downloading host genomes and GenoPHI genomes:
+A **randomly sampled subset** of the BAPS dataset was used to create an independent evaluation test set.
 
-```bash
-mash sketch -o mash/genophi_ecoli_downloaded genophi_ecoli_157_genomes.txt
-mash sketch -o mash/baps_ecoli_200 baps_ecoli_200_genomes.txt
+Dataset characteristics:
 
-mash dist mash/genophi_ecoli_downloaded.msh \
-          mash/baps_ecoli_200.msh \
-  > mash_dist_genophiTrain_vs_baps200.tsv
-```
-## Future Work
+- 200 bacterial strains
+- 144 phages
+- 28,800 strain–phage prediction combinations
+- 428 labelled interaction pairs
 
--   Expand training set using larger BAPS interaction matrices
--   Retrain GenoPHI on more phylogenetically diverse host–phage pairs
--   Evaluate model performance versus genomic distance bins
+## Methods
+
+The evaluation pipeline followed these steps:
+
+1. Assign proteins from BAPS strains and phages to GenoPHI protein families using **MMseqs2**
+2. Convert assignments to **binary presence/absence feature tables**
+3. Generate predictions using trained **CatBoost models**
+4. Aggregate prediction confidence scores across training runs
+5. Evaluate predictions using standard metrics:
+
+- ROC-AUC
+- PR-AUC
+- Accuracy
+- Precision
+- Recall
+- MCC
+
+## Results Summary
+
+Model performance on the BAPS dataset:
+
+| Metric | Value |
+|------|------|
+| ROC-AUC | 0.44 |
+| Accuracy | 0.16 |
+| Precision | 0 |
+| Recall | 0 |
+
+The model predicted **all interactions as negative** at the default threshold.
+
+Protein family overlap analysis shows that many BAPS phages contain proteins not present in the GenoPHI training dataset, limiting feature representation and reducing prediction accuracy.
+
+## Repository Structure
+# GenoPHI Generalisation Analysis on BAPS Dataset
+
+This repository contains the code and analysis used to evaluate the generalisation performance of the GenoPHI phage–host interaction prediction framework on an external dataset derived from BAPS (Bacterial Assembly-Associated Phage Sequences).
+
+## Project Overview
+
+Predicting phage–host interactions is important for applications such as phage therapy and microbiome engineering. GenoPHI is a machine learning framework that predicts strain-level phage–host interactions using genome-derived features.
+
+This project evaluates whether GenoPHI generalises to an independent dataset of phage–host interactions derived from BAPS.
+
+The key goals were:
+
+- Apply trained GenoPHI models to an external dataset
+- Evaluate predictive performance on unseen phage genomes
+- Investigate causes of reduced performance
+- Analyse protein family overlap between training and evaluation datasets
+
+## Dataset
+
+The evaluation dataset is derived from the **BAPS phage–host interaction dataset**.
+
+A **randomly sampled subset** of the BAPS dataset was used to create an independent evaluation test set.
+
+Dataset characteristics:
+
+- 200 bacterial strains
+- 144 phages
+- 28,800 strain–phage prediction combinations
+- 428 labelled interaction pairs
+
+## Methods
+
+The evaluation pipeline followed these steps:
+
+1. Assign proteins from BAPS strains and phages to GenoPHI protein families using **MMseqs2**
+2. Convert assignments to **binary presence/absence feature tables**
+3. Generate predictions using trained **CatBoost models**
+4. Aggregate prediction confidence scores across training runs
+5. Evaluate predictions using standard metrics:
+
+- ROC-AUC
+- PR-AUC
+- Accuracy
+- Precision
+- Recall
+- MCC
+
+## Results Summary
+
+Model performance on the BAPS dataset:
+
+| Metric | Value |
+|------|------|
+| ROC-AUC | 0.44 |
+| Accuracy | 0.16 |
+| Precision | 0 |
+| Recall | 0 |
+
+The model predicted **all interactions as negative** at the default threshold.
+
+Protein family overlap analysis shows that many BAPS phages contain proteins not present in the GenoPHI training dataset, limiting feature representation and reducing prediction accuracy.
+
+## Repository Structure
+scripts/
+Prediction and analysis scripts
+
+figures/
+Generated plots and visualisations
+
+results/
+Processed prediction outputs and evaluation tables
+
+report/
+Dissertation sections and write-ups
+
+README.md
+.gitignore
+
+
+## Key Findings
+
+- GenoPHI performs well on its training datasets but **fails to generalise to the BAPS dataset**
+- Many BAPS phages lack proteins present in the GenoPHI training feature space
+- Dataset distribution shift likely contributes to reduced predictive performance
+
+## Author
+
+Irvin Kshirsagar  
+Biomedical Engineering
