@@ -50,3 +50,4 @@ strain_all_predictions.csv
 *.synctex.gz
 *.fls
 *.fdb_latexmk
+results/*.tsv
