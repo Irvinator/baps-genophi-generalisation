@@ -1,0 +1,3 @@
+train rows= 9971 hosts= 9388 phages= 9971 STs= 452 clusters= 4822
+val rows= 1937 hosts= 1870 phages= 1937 STs= 90 clusters= 795
+test rows= 2086 hosts= 2020 phages= 2086 STs= 94 clusters= 1262

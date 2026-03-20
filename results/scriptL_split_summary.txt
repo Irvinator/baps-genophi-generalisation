@@ -1,0 +1,12 @@
+usable_rows = 14467
+ST_assigned_rows = {'train': 10127, 'val': 2170, 'test': 2170}
+dropped_conflicting_rows = 473
+train rows = 9971 -> /mnt/d/baps-genophi-generalisation/results/baps_full_pos_train_majority.tsv
+val rows = 1937 -> /mnt/d/baps-genophi-generalisation/results/baps_full_pos_val_majority.tsv
+test rows = 2086 -> /mnt/d/baps-genophi-generalisation/results/baps_full_pos_test_majority.tsv
+ST_overlap_train_val = 0
+CL_overlap_train_val = 0
+ST_overlap_train_test = 0
+CL_overlap_train_test = 0
+ST_overlap_val_test = 0
+CL_overlap_val_test = 0

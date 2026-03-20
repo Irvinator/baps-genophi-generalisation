@@ -1,0 +1,19 @@
+Strict leakage controls:
+- No shared MLST sequence types across splits
+- No shared phage clusters across splits
+
+Final positive splits:
+- train: 9971
+- val: 1937
+- test: 2086
+
+Final pos/neg datasets:
+- train: 9971 pos, 9971 neg, 19942 total
+- val: 1937 pos, 1937 neg, 3874 total
+- test: 2086 pos, 2086 neg, 4172 total
+
+Notes:
+- Host MLST typing succeeded for 23643 hosts
+- 56 host genomes could not be retrieved
+- UNKNOWN-ST hosts were excluded from final split construction
+- Majority-based split retained far more data than strict connected-component splitting while preserving zero ST and phage-cluster leakage
