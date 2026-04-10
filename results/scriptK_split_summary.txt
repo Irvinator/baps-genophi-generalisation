@@ -1,0 +1,13 @@
+usable_rows = 14467
+ST target sizes = {'train': 10127, 'val': 2170, 'test': 2170}
+CL target sizes = {'train': 10127, 'val': 2170, 'test': 2170}
+dropped_conflicting_rows = 6148
+train rows = 7581 -> /mnt/d/baps-genophi-generalisation/results/baps_full_pos_train_greedy.tsv
+val rows = 478 -> /mnt/d/baps-genophi-generalisation/results/baps_full_pos_val_greedy.tsv
+test rows = 260 -> /mnt/d/baps-genophi-generalisation/results/baps_full_pos_test_greedy.tsv
+ST_overlap_train_val = 0
+CL_overlap_train_val = 0
+ST_overlap_train_test = 0
+CL_overlap_train_test = 0
+ST_overlap_val_test = 0
+CL_overlap_val_test = 0

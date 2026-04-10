@@ -51,3 +51,84 @@ strain_all_predictions.csv
 *.fls
 *.fdb_latexmk
 results/*.tsv
+
+# -------- Large raw data --------
+*.zip
+*.gz
+*.fa
+*.fasta
+*.fna
+*.faa
+
+# -------- Genome / collaborator data --------
+aim2_ecoli96/millard_phage_genomes/
+downloaded_hosts/
+host_AAs_baps/
+
+# -------- MMseqs / clustering / temporary outputs --------
+mmseqs_phage60/
+tmp/
+tmp_lin/
+**/tmp/
+**/*.dbtype
+**/*.index
+
+# -------- Large training/build outputs --------
+**/train_host_AAs/
+**/train_phage_AAs/
+**/val_host_AAs/
+**/val_phage_AAs/
+**/prodigal_proteins/
+**/prodigal_genes/
+
+# -------- Large model artefacts / intermediates --------
+*.cbm
+*.npy
+*.npz
+*.pkl
+*.pickle
+
+# -------- Optional bulky result folders (uncomment if needed) --------
+# final_model_outputs/
+# final_model_outputs_cv/
+# train_feature_build/
+
+# Large raw / intermediate data
+full_baps_phage_db
+full_baps_phage_db.source
+full_baps_phage_db_h
+full_baps_tmp/
+mmseqs_full_baps/
+host_download_batches/
+
+# Large retraining intermediates
+retrain_reduced_rows1500/
+retrain_reduced_rows1500_ph150/
+
+# Raw collaborator genome files
+aim2_ecoli96/millard_phage_genomes/
+aim2_ecoli96/prodigal_proteins/
+aim2_ecoli96/prodigal_genes/
+
+# Optional bulky build folders anywhere
+**/train_feature_build/
+**/frozen_outputs/
+**/genophi_inputs/train_host_AAs/
+**/genophi_inputs/train_phage_AAs/
+**/genophi_inputs/val_host_AAs/
+**/genophi_inputs/val_phage_AAs/
+
+# Raw sequence archives
+*.zip
+*.gz
+*.fa
+*.fasta
+*.fna
+*.faa
+
+# Model artefacts
+*.cbm
+*.pkl
+*.pickle
+*.npy
+*.npz
