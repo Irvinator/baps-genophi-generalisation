@@ -18,9 +18,9 @@ from sklearn.metrics import (
 )
 from sklearn.model_selection import StratifiedKFold
 
-
-DATA = Path("/mnt/d/baps-genophi-generalisation/retrain_reduced_rows1500_ph150/final_merged_feature_table.csv")
-OUTDIR = Path("/mnt/d/baps-genophi-generalisation/retrain_reduced_rows1500_ph150/final_model_outputs_cv")
+ROOT = Path(__file__).resolve().parents[1]
+DATA = ROOT / "data" / "reduced" / "final_merged_feature_table.csv"
+OUTDIR = ROOT / "outputs" / "final_model_outputs_cv"
 OUTDIR.mkdir(parents=True, exist_ok=True)
 
 
